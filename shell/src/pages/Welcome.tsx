@@ -21,7 +21,7 @@ const Welcome = () => {
                     <h1 className='animated-text text-3xl font-bold text-[#001b71] lg:text-4xl cursor-pointer'>
                         Welcome to Devappment...
                     </h1>
-                    <Button onClick={handleNavigate}>Home</Button>
+                    <Button size='lg' onClick={handleNavigate}>Home</Button>
                 </div>
             </div>
         </>
