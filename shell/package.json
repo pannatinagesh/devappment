@@ -3,6 +3,10 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "workspaces": [
+    "shell",
+    "mfe-1"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
