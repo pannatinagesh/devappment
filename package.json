@@ -1,5 +1,12 @@
 {
     "private": true,
-    "workspaces": ["shell"]
-  }
-  
+    "workspaces": [
+        "shell"
+    ],
+    "scripts": {
+        "dev": "vite",
+        "build": "tsc -b && vite build",
+        "lint": "eslint .",
+        "preview": "vite preview"
+    }
+}
