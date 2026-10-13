@@ -18,7 +18,7 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "remoteApp/*": ["../react-mfe/dist/types/*"]
+      "remoteApp/*": ["../mfe-1/dist/types/*"]
     },
 
     /* Linting */

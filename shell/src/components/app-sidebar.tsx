@@ -22,8 +22,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarMenuItem>
               <SidebarMenuButton asChild className="data-[slot=sidebar-menu-button]:!p-1.5">
                 <a href="#">
-                 <img src="https://devappment.in/wp-content/uploads/2024/09/Devappment_Logo.png" />
-                  {/* <span className="text-base font-semibold">Devappment</span> */}
+                 <img src={"/logo.jpg"} width={30} height={30} />
+                  <span className="text-base font-semibold">Devappment</span>
                 </a>
               </SidebarMenuButton>
             </SidebarMenuItem>
