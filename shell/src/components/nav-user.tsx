@@ -82,13 +82,13 @@ const navigate = useNavigate();
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
+              <DropdownMenuItem className="cursor-pointer">
                 <UserCircleIcon />
                 Profile
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => navigate('welcome')}>
+            <DropdownMenuItem className="cursor-pointer" onClick={() => navigate('/signin')}>
               <LogOutIcon />
               Log out
             </DropdownMenuItem>

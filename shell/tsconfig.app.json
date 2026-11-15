@@ -15,10 +15,10 @@
     "jsx": "react-jsx",
 
     /* Alias */
-    "baseUrl": ".",
+    // "baseUrl": "./",
     "paths": {
       "@/*": ["./src/*"],
-      "remoteApp/*": ["../mfe-1/dist/types/*"]
+      // "remoteApp/*": ["../mfe-1/dist/types/*"]
     },
 
     /* Linting */

@@ -13,7 +13,7 @@ const Welcome = () => {
             <div className='h-full w-full'>
                 <div className='grid grid-cols-2 justify-center items-center'>
                     <div className='col-span-1'>
-                        <img src={'/image.jpg'} className='w-full h-[100vh]'/>
+                        <img src={'/image.jpg'} className='w-full h-screen'/>
                     </div>
                     <div className='col-span-1 flex flex-col items-center justify-center'>
                     <div className='flex flex-col items-center justify-center w-3/4'>

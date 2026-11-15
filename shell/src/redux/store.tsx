@@ -1,12 +1,22 @@
 import { configureStore } from '@reduxjs/toolkit'
-import rootReducer from './reduces'
-import { persistStore, persistReducer } from 'redux-persist'
-import storage from 'redux-persist/lib/storage'
+import rootReducer from './reduces/index';
+import createWebStorage from 'redux-persist/es/storage/createWebStorage'
+import {
+  persistStore, persistReducer,
+  FLUSH,
+  REHYDRATE,
+  PAUSE,
+  PERSIST,
+  PURGE,
+  REGISTER,
+} from "redux-persist";
+
+const storage = createWebStorage('local')
 
 const persistConfig = {
   key: 'root', // Key for the persisted state in storage
-  storage, // Storage engine (e.g., localStorage)
-  safelist: ['auth'], // Array of reducers to persist (only 'auth' in this case)
+  storage, // Storage engine (localStorage)
+  whitelist: ['signin'],
 }
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)
@@ -15,7 +25,9 @@ const store = configureStore({
   reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      serializableCheck: false,
+      serializableCheck: {
+        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+      }
     }),
 })
 

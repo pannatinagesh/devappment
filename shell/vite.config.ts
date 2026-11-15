@@ -1,23 +1,30 @@
-import { defineConfig } from "vite";
-import federation from "@originjs/vite-plugin-federation";
+import { defineConfig, type PluginOption } from "vite";
+// import federation from "@originjs/vite-plugin-federation";
 import react from "@vitejs/plugin-react";
-import path from "path"
+// import { visualizer } from 'rollup-plugin-visualizer';
+
+const plugins: PluginOption[] = [
+  react({
+    // babel: {
+    //   plugins: ["babel-plugin-react-compiler"],
+    // },
+  }) as PluginOption,
+  // visualizer({ open: true }),
+  // federation({
+  //   name: "react-mfe-host",
+  //   remotes: {
+  //     remoteApp: "http://localhost:5001/assets/remoteEntry.js",
+  //   },
+  //   shared: ["react", "react-dom"],
+  // })
+];
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [
-    react(),
-    federation({
-      name: "react-mfe-host",
-      remotes: {
-        remoteApp: "http://localhost:5001/assets/remoteEntry.js",
-      },
-      shared: ["react", "react-dom"],
-    }),
-  ],
+  plugins,
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
+      "@": import.meta.dirname + "/src",
     },
   },
   build: {
@@ -25,5 +32,11 @@ export default defineConfig({
   },
   css: {
     postcss: './postcss.config.js',
+  },
+  optimizeDeps: {
+    include: [
+      'redux-persist',
+      'redux-persist/es/storage/createWebStorage',
+    ],
   },
 });

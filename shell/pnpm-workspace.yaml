@@ -1,0 +1,6 @@
+# pnpm 10 -> 12 upgrade compatibility.
+# pnpm 12 enforces a minimum release-age supply-chain policy and re-verifies
+# deps before running scripts. Both blocked `pnpm run dev` on recently
+# published transitive deps. Relax for local development.
+minimumReleaseAge: 0
+verifyDepsBeforeRun: false

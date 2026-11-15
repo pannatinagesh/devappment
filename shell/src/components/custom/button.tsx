@@ -41,8 +41,8 @@ export interface ButtonProps
     VariantProps<typeof buttonVariants> {
   asChild?: boolean
   loading?: boolean
-  leftSection?: JSX.Element
-  rightSection?: JSX.Element
+  leftSection?: React.JSX.Element
+  rightSection?: React.JSX.Element
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(

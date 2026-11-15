@@ -25,7 +25,7 @@ export function NavMain({ items }: { items: SideLink[] }) {
                                     to={item.href}
                                     aria-current={checkActiveNav(item.href) ? 'page' : undefined}>
                                     <SidebarMenuButton tooltip={item.title} className={cn(buttonVariants({ variant: checkActiveNav(item.href) ? 'primary' : 'outline', size: 'lg' }),
-                                        'h-12 justify-start text-wrap rounded-none px-6 hover:bg-slate-100 hover:text-[#2545af]', checkActiveNav(item.href) ? `bg-slate-100 text-[#2545af]` : '',
+                                        'cursor-pointer h-12 justify-start text-wrap rounded-none px-6 hover:bg-slate-100 hover:text-[#2545af]', checkActiveNav(item.href) ? `bg-slate-100 text-[#2545af]` : '',
                                     )}>
                                         {item.icon}
                                         <span>{item.title}</span>

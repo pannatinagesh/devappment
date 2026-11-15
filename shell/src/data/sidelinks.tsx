@@ -1,4 +1,5 @@
 import Iconify from '@/components/custom/iconify'
+import { JSX } from 'react/jsx-runtime'
 export interface NavLink {
   title: string
   label?: string
@@ -14,6 +15,12 @@ export const Usersidelinks: SideLink[] = [
     title: 'Dashboard',
     label: '',
     href: '/dashboard',
+    icon: <Iconify icon="vaadin:line-bar-chart" width={20} height={20} />,
+  },
+  {
+    title: 'Task',
+    label: '',
+    href: '/task',
     icon: <Iconify icon="vaadin:line-bar-chart" width={20} height={20} />,
   },
 ]

@@ -3,11 +3,12 @@ import { _login } from '../actions/signin';
 
 export const initialState: any = {
   isloading: false,
+  isAuthenticated: false,
   userDetails: {data: { }},
 }
 
 const signinSlice = createSlice({
-  name: 'user',
+  name: 'signin',
   initialState,
   reducers: {},
   extraReducers: (builder) => {
@@ -19,16 +20,16 @@ const signinSlice = createSlice({
       .addCase(_login.fulfilled, (state, action) => ({
         ...state,
         isloading: false,
+        isAuthenticated: true,
         ...action.payload,
       }))
       .addCase(_login.rejected, (state, action) => ({
         ...state,
         isloading: false,
+        isAuthenticated: false,
         ...action.error,
       }))
   },
 })
 
 export default signinSlice.reducer
-
-

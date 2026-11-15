@@ -1,6 +1,6 @@
 import { Layout, LayoutBody } from '@/components/custom/layout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import LineChart from './Chart'
+import LineChart from './Chart';
 
 const Dashboard = () => {
   return (

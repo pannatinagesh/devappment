@@ -1,10 +1,77 @@
-import axios, { AxiosError } from 'axios'
+import axios, { AxiosError, AxiosRequestConfig } from 'axios'
 import { toast } from "sonner"
 import { NavigateFunction } from 'react-router-dom'
+import { dev_url } from '../../config'
+
+const axiosInstance = axios.create({
+  baseURL: dev_url,
+  withCredentials: true,
+  headers: { 'Content-Type': 'application/json' },
+})
+
+type RetriableConfig = AxiosRequestConfig & { _retry?: boolean }
+
+let isRefreshing = false
+let pendingQueue: {
+  resolve: () => void
+  reject: (error: unknown) => void
+}[] = []
+
+const processQueue = (error: unknown) => {
+  pendingQueue.forEach((p) => (error ? p.reject(error) : p.resolve()))
+  pendingQueue = []
+}
+
+const refreshToken = async () => {
+  await axios.post(
+    `${dev_url}/user/refresh-token`,
+    {},
+    { withCredentials: true }
+  )
+}
+
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  async (error: AxiosError) => {
+    const originalRequest = error.config as RetriableConfig | undefined
+    const status = error.response?.status
+    const isRefreshCall = originalRequest?.url?.includes('/user/refresh-token')
+
+    if (status === 401 && originalRequest && !originalRequest._retry && !isRefreshCall) {
+      if (isRefreshing) {
+        // Wait for the in-flight refresh, then replay this request.
+        return new Promise((resolve, reject) => {
+          pendingQueue.push({
+            resolve: () => resolve(axiosInstance(originalRequest)),
+            reject,
+          })
+        })
+      }
+
+      originalRequest._retry = true
+      isRefreshing = true
+
+      try {
+        await refreshToken()
+        processQueue(null)
+        return axiosInstance(originalRequest)
+      } catch (refreshError) {
+        processQueue(refreshError)
+        return Promise.reject(refreshError)
+      } finally {
+        isRefreshing = false
+      }
+    }
+
+    return Promise.reject(error)
+  }
+)
+
+export { axiosInstance }
 
 export async function Post(url: string, data: object, navigate: NavigateFunction) {
   try {
-    const response = await axios.post(url, data)
+    const response = await axiosInstance.post(url, data)
     return response
   } catch (error: any) {
     const err = error as AxiosError
@@ -28,7 +95,7 @@ export async function Post(url: string, data: object, navigate: NavigateFunction
 
 export async function Get(url: string, id: string, navigate: NavigateFunction) {
   try {
-    const response = await axios.get(url + id)
+    const response = await axiosInstance.get(url + id)
     return response
   } catch (error: any) {
     const err = error as AxiosError
@@ -52,7 +119,7 @@ export async function Get(url: string, id: string, navigate: NavigateFunction) {
 
 export async function GetAll(url: string, navigate: NavigateFunction) {
   try {
-    const response = await axios.get(url)
+    const response = await axiosInstance.get(url)
     return response
   } catch (error: any) {
     const err = error as AxiosError
@@ -77,7 +144,7 @@ export async function GetAll(url: string, navigate: NavigateFunction) {
 
 export async function Put(url: string, id: string, data: object, navigate: NavigateFunction) {
   try {
-    const response = await axios.put(url + id, data)
+    const response = await axiosInstance.put(url + id, data)
     return response
   } catch (error: any) {
     const err = error as AxiosError
@@ -101,7 +168,7 @@ export async function Put(url: string, id: string, data: object, navigate: Navig
 
 export async function Delete(url: string, id: string, navigate: NavigateFunction) {
   try {
-    const response = await axios.delete(url + id)
+    const response = await axiosInstance.delete(url + id)
     return response
   } catch (error: any) {
     const err = error as AxiosError
