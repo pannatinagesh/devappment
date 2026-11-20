@@ -66,7 +66,7 @@ const ListTable = () => {
     return formattedDate
   }
   return (
-    <div className="h-full w-full p-4">
+    <div className="h-full w-full p-4 overflow-auto">
       <div className="flex justify-between items-center">
         <Label>User Task</Label>
         <Button onClick={() => setOpen({ open: true, id: null })}>Create Task</Button>

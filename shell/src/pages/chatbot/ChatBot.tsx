@@ -4,7 +4,7 @@ import { useAppDispatch } from "@/hooks/use-redux";
 import { cn } from "@/lib/utils";
 import { _GetChat, _PostChat } from "@/redux/actions/chat";
 import { ArrowDown, SendHorizontal } from "lucide-react";
-import { Fragment, UIEvent, useEffect, useRef, useState } from "react";
+import { Fragment, ReactNode, UIEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 type ChatMessage = {
@@ -63,8 +63,30 @@ const ChatBot = ({ open, setOpen }: { open: boolean, setOpen: (open: boolean) =>
     const [sending, setSending] = useState(false);
     const [showScrollBtn, setShowScrollBtn] = useState(false);
     const scrollRef = useRef<HTMLDivElement>(null);
+    const inputref = useRef<HTMLTextAreaElement>(null)
 
     const rafRef = useRef<number | null>(null);
+
+    const groupedMessages = useMemo(() => {
+        const groups: { dateKey: string; label: string; items: ChatMessage[] }[] = [];
+
+        messages.forEach((m) => {
+            const lastGroup = groups[groups.length - 1];
+            if (!lastGroup || !isSameDay(lastGroup.items[0].createdAt, m.createdAt)) {
+                groups.push({
+                    dateKey: m.id,
+                    label: formatDayLabel(m.createdAt),
+                    items: [m],
+                });
+            } else {
+                lastGroup.items.push(m);
+            }
+        });
+
+        return groups;
+    }, [messages]);
+
+    console.log(groupedMessages)
 
     const cancelScrollAnimation = () => {
         if (rafRef.current !== null) {
@@ -127,8 +149,19 @@ const ChatBot = ({ open, setOpen }: { open: boolean, setOpen: (open: boolean) =>
 
     useEffect(() => {
         if (loadingHistory) return;
-        requestAnimationFrame(() => scrollToBottom(sending || messages.length > 1 ? 'smooth' : 'auto'));
+        scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
     }, [messages, sending, loadingHistory]);
+
+    useEffect(() => {
+        if (!open) return;
+
+        // requestAnimationFrame ensures the dialog DOM has mounted and painted
+        const frame = requestAnimationFrame(() => {
+            inputref.current?.focus()
+        });
+
+        return () => cancelAnimationFrame(frame);
+    }, [open]);
 
     const sendMessage = async (e?: any) => {
         e?.preventDefault();
@@ -156,10 +189,18 @@ const ChatBot = ({ open, setOpen }: { open: boolean, setOpen: (open: boolean) =>
 
     const canSend = !sending && !!message.trim();
 
+    function inline(text: string): ReactNode[] {
+        return text.split(/(\*\*[^*\n]+\*\*|`[^`\n]+`)/g).map((part, i) => {
+            if (part.length > 4 && part.startsWith('**') && part.endsWith('**')) return <strong key={i} className="font-semibold">{part.slice(2, -2)}</strong>
+            if (part.length > 2 && part.startsWith('`') && part.endsWith('`')) return <code key={i} className="rounded bg-muted px-1 py-0.5 font-mono text-[11px]">{part.slice(1, -1)}</code>
+            return <Fragment key={i}>{part}</Fragment>
+        })
+    }
+
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogContent className="flex min-w-2xl h-136 max-h-[85vh] flex-col gap-3">
-                <DialogHeader className="font-semibold text-[#001b71]">Chat with AVA</DialogHeader>
+                <DialogHeader className="font-semibold text-[#001b71]">Chat with EVA</DialogHeader>
 
                 <div className="relative min-h-0 flex-1">
                     <div ref={scrollRef} onScroll={handleScroll} onWheel={cancelScrollAnimation} onTouchStart={cancelScrollAnimation} className="h-full space-y-3 overflow-y-auto rounded-xl border bg-muted/30 p-3 custom-scrollbar">
@@ -171,39 +212,41 @@ const ChatBot = ({ open, setOpen }: { open: boolean, setOpen: (open: boolean) =>
                             </>
                         ) : messages.length === 0 ? (
                             <p className="mt-10 text-center text-sm text-muted-foreground">
-                                Hi, I&apos;m AVA. Ask me anything to get started.
+                                Hi, I&apos;m EVA. Ask me anything to get started.
                             </p>
                         ) : (
-                            messages.map((m, i) => (
-                                <Fragment key={m.id}>
-                                    {(i === 0 || !isSameDay(messages[i - 1].createdAt, m.createdAt)) && (
-                                        <div className="sticky top-0 flex justify-center py-1">
-                                            <span className="rounded-full bg-white px-3 py-0.5 text-[11px] font-medium text-muted-foreground shadow-sm ring-1 ring-border">
-                                                {formatDayLabel(m.createdAt)}
-                                            </span>
-                                        </div>
-                                    )}
-                                    <div className={cn('flex', m.role === 'user' ? 'justify-end' : 'justify-start')}>
-                                        <div
-                                            className={cn(
-                                                'max-w-[80%] rounded-2xl px-3 py-2 text-sm shadow-sm',
-                                                m.role === 'user'
-                                                    ? 'rounded-br-sm bg-[#001b71] text-white'
-                                                    : 'rounded-bl-sm border bg-white text-foreground'
-                                            )}
-                                        >
-                                            <p className="whitespace-pre-wrap wrap-break-word">{m.text}</p>
-                                            <p
+                            groupedMessages.map((m) => (
+                                <div key={m.dateKey} className="relative">
+                                    {/* Sticky Date Header for this day's section */}
+                                    <div className="sticky top-2 z-10 flex justify-center py-1 pointer-events-none">
+                                        <span className="rounded-full bg-white/95 backdrop-blur-sm px-3 py-0.5 text-[11px] font-medium text-muted-foreground shadow-sm ring-1 ring-border">
+                                            {m.label}
+                                        </span>
+                                    </div>
+
+                                    {m.items.map((item) => (
+                                        <div className={cn('flex', item.role === 'user' ? 'justify-end' : 'justify-start')}>
+                                            <div
                                                 className={cn(
-                                                    'mt-1 text-right text-[10px]',
-                                                    m.role === 'user' ? 'text-white/70' : 'text-muted-foreground'
+                                                    'max-w-[80%] rounded-2xl px-3 py-2 text-sm shadow-sm mb-3',
+                                                    item.role === 'user'
+                                                        ? 'rounded-br-sm bg-[#001b71] text-white'
+                                                        : 'rounded-bl-sm border bg-white text-foreground'
                                                 )}
                                             >
-                                                {formatTime(m.createdAt)}
-                                            </p>
+                                                <p className="whitespace-pre-wrap wrap-break-word">{inline(item.text)}</p>
+                                                <p
+                                                    className={cn(
+                                                        'mt-1 text-right text-[10px]',
+                                                        item.role === 'user' ? 'text-white/70' : 'text-muted-foreground'
+                                                    )}
+                                                >
+                                                    {formatTime(item.createdAt)}
+                                                </p>
+                                            </div>
                                         </div>
-                                    </div>
-                                </Fragment>
+                                    ))}
+                                </div>
                             ))
                         )}
 
@@ -236,14 +279,14 @@ const ChatBot = ({ open, setOpen }: { open: boolean, setOpen: (open: boolean) =>
                     </button>
                 </div>
 
-                <form onSubmit={sendMessage} className="flex items-center gap-2 rounded-full border bg-white py-1.5 pl-4 pr-1.5 shadow-sm transition focus-within:border-[#001b71]/50 focus-within:shadow-md focus-within:ring-4 focus-within:ring-[#001b71]/10">
-                    <input
-                        value={message}
+                <form onSubmit={sendMessage} className="flex items-center gap-2 rounded-md border bg-white p-2 shadow-sm transition focus-within:border-[#001b71]/50 focus-within:shadow-md focus-within:ring-4 focus-within:ring-[#001b71]/10">
+                    <textarea id="chat-input"
+                        value={message} ref={inputref}
                         onChange={(e) => setMessage(e.target.value)}
-                        placeholder="Ask AVA anything..."
+                        placeholder="Ask EVA anything..."
                         autoComplete="off"
                         disabled={sending}
-                        className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed"
+                        className="min-w-0 flex-1 align-middle bg-transparent text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed"
                     />
                     <button
                         type="submit"

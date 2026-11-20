@@ -23,14 +23,14 @@ export default function AppShell() {
         <Tooltip>
           <TooltipTrigger>
             <Avatar className="size-10 cursor-pointer" onClick={() => setOpen(true)}>
-              <AvatarImage src={'/chatIcon.png'} alt="AVA" />
-              <AvatarFallback>AVA</AvatarFallback>
+              <AvatarImage src={'/chatIcon.png'} alt="EVA" />
+              <AvatarFallback>EVA</AvatarFallback>
               <AvatarBadge className="bg-green-600 dark:bg-green-800" />
             </Avatar>
           </TooltipTrigger>
           <TooltipContent>
             <TooltipArrow style={{ fill: '#001b71' }} />
-            <p>Chat with AVA</p>
+            <p>Chat with EVA</p>
           </TooltipContent>
         </Tooltip>
       </div>
