@@ -23,9 +23,15 @@ export const Usersidelinks: SideLink[] = [
     href: '/task',
     icon: <Iconify icon="vaadin:line-bar-chart" width={20} height={20} />,
   },
+  {
+    title: 'Upload Documents',
+    label: '',
+    href: '/upload',
+    icon: <Iconify icon="akar-icons:cloud-upload" width={20} height={20} />,
+  }
 ]
 
-export const userData =  {
+export const userData = {
   user: {
     name: "Nagesh Pannati",
     email: "nagesh@gmail.com",

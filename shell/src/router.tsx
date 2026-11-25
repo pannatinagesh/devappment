@@ -13,6 +13,7 @@ import ListTable from './pages/task/ListTask';
 import SignIn from './pages/signin/SignIn';
 import SignUp from './pages/signin/SignUp';
 import ProtectedRoute from './components/ProtectedRoute';
+import UploadDocuments from './pages/upload_documents/UploadDocuments';
 
 let userRoutes = [
   { path: 'dashboard', element: <Dashboard /> },
@@ -22,6 +23,7 @@ let userRoutes = [
   { path: 'userdetails', element: <UserDetails /> },
   { path: 'profile', element: <ProfileForm /> },
   { path: 'task', element: <ListTable /> },
+  { path: 'upload', element: <UploadDocuments /> },
 ]
 
 export const RouteElements = () => {
